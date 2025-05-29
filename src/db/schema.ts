@@ -99,7 +99,10 @@ export const patientsTable = pgTable("patients", {
   id: uuid("id").defaultRandom().primaryKey(),
   clinic_id: uuid("clinic_id")
     .notNull()
-    .references(() => clinicsTable.id, { onDelete: "cascade" }),
+    .references(() => clinicsTable.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
   name: text("name").notNull(),
   email: text("email").notNull(),
   sex: patientSexEnum("sex").notNull(),
@@ -123,15 +126,24 @@ export const appointmentsTable = pgTable("appointments", {
 
   clinicId: uuid("clinic_id")
     .notNull()
-    .references(() => clinicsTable.id, { onDelete: "cascade" }),
+    .references(() => clinicsTable.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
 
   patientId: uuid("patient_id")
     .notNull()
-    .references(() => patientsTable.id, { onDelete: "cascade" }),
+    .references(() => patientsTable.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
 
   doctorId: uuid("doctor_id")
     .notNull()
-    .references(() => doctorsTable.id, { onDelete: "cascade" }),
+    .references(() => doctorsTable.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
 
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
