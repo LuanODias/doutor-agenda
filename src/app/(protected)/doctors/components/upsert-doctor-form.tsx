@@ -1,8 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAction } from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
 import { NumericFormat } from "react-number-format";
 import { z } from "zod";
 
+import { upsertDoctor } from "@/actions/upsert-doctor";
 import { Button } from "@/components/ui/button";
 import {
   DialogContent,
@@ -75,6 +77,8 @@ const UpsertDoctorForm = () => {
       availableToTime: "23:30:00",
     },
   });
+
+  const upsertDoctorAction = useAction(upsertDoctor);
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     console.log(values);
