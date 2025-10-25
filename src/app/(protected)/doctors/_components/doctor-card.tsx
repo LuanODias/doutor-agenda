@@ -1,0 +1,79 @@
+"use client";
+
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
+import { doctorsTable } from "@/db/schema";
+
+import { CalendarIcon, ClockIcon, DollarSignIcon } from "lucide-react";
+import UpsertDoctorForm from "./upsert-doctor-form";
+import { getAvailability } from "../helpers/availability";
+import { formatCurrencyInCents } from "@/helpers/currency";
+
+interface DoctorCardProps {
+  doctor: typeof doctorsTable.$inferSelect;
+}
+
+const DoctorCard = ({ doctor }: DoctorCardProps) => {
+  const doctorInitials = doctor.name
+    .split(" ")
+    .slice(0, 2)
+    .map((name) => name[0])
+    .join("");
+  const availability = getAvailability(doctor);
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>
+          <div className="flex items-center gap-2">
+            <Avatar className="h-10 w-10">
+              <AvatarFallback>{doctorInitials}</AvatarFallback>
+            </Avatar>
+            <div>
+              <h3 className="text-sm font-medium">{doctor.name}</h3>
+              <p className="text-muted-foreground text-sm">
+                {doctor.speciality}
+              </p>
+            </div>
+          </div>
+        </CardTitle>
+      </CardHeader>
+      <Separator />
+      <CardContent className="flex flex-col gap-2">
+        <Badge variant="outline">
+          <CalendarIcon className="mr-1" />
+          {availability.from.format("dddd")} a {availability.to.format("dddd")}
+        </Badge>
+        <Badge variant="outline">
+          <ClockIcon className="mr-1" />
+          {availability.from.format("HH:mm")} às{" "}
+          {availability.to.format("HH:mm")}
+        </Badge>
+        <Badge variant="outline">
+          <DollarSignIcon className="mr-1" />
+          {formatCurrencyInCents(doctor.appointmentPriceInCents)}
+        </Badge>
+      </CardContent>
+      <Separator />
+      <CardFooter>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button className="w-full">Ver detalhes</Button>
+          </DialogTrigger>
+          <UpsertDoctorForm />
+        </Dialog>
+      </CardFooter>
+    </Card>
+  );
+};
+
+export default DoctorCard;
