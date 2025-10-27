@@ -1,4 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { AlertDialogTrigger } from "@radix-ui/react-alert-dialog";
+import { TrashIcon } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
 import { NumericFormat } from "react-number-format";
@@ -6,6 +8,17 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import { upsertDoctor } from "@/actions/upsert-doctor";
+import { deleteDoctor } from "@/actions/upsert-doctor/delete-doctor";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
   DialogContent,
@@ -96,6 +109,21 @@ const UpsertDoctorForm = ({ doctor, OnSuccess }: UpsertDoctorFormProps) => {
       toast.error("Erro ao adicionar médico");
     },
   });
+
+  const deleteDoctorAction = useAction(deleteDoctor, {
+    onSuccess: () => {
+      toast.success("Médico deletado com sucesso");
+      OnSuccess?.();
+    },
+    onError: () => {
+      toast.error("Erro ao deletar médico");
+    },
+  });
+
+  const handleDeleteDoctorClick = () => {
+    if (!doctor) return;
+    deleteDoctorAction.execute({ id: doctor.id });
+  };
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     upsertDoctorAction.execute({
@@ -380,6 +408,32 @@ const UpsertDoctorForm = ({ doctor, OnSuccess }: UpsertDoctorFormProps) => {
           />
 
           <DialogFooter>
+            {doctor && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline">
+                    <TrashIcon /> Deletar Médico
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Tem certeza que deseja deletar esse médico?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Essa ação não será revertida. Isso irá deletar o médico e
+                      todas as consultas agendadas.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDeleteDoctorClick}>
+                      Deletar
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
             <Button type="submit" disabled={upsertDoctorAction.isPending}>
               {upsertDoctorAction.isPending
                 ? "Salvando..."
