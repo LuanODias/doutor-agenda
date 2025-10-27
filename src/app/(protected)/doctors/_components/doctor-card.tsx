@@ -1,5 +1,8 @@
 "use client";
 
+import { CalendarIcon, ClockIcon, DollarSignIcon } from "lucide-react";
+import { useState } from "react";
+
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,12 +16,10 @@ import {
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { doctorsTable } from "@/db/schema";
-
-import { CalendarIcon, ClockIcon, DollarSignIcon } from "lucide-react";
-import UpsertDoctorForm from "./upsert-doctor-form";
-import { getAvailability } from "../helpers/availability";
 import { formatCurrencyInCents } from "@/helpers/currency";
-import { useState } from "react";
+
+import { getAvailability } from "../helpers/availability";
+import UpsertDoctorForm from "./upsert-doctor-form";
 
 interface DoctorCardProps {
   doctor: typeof doctorsTable.$inferSelect;

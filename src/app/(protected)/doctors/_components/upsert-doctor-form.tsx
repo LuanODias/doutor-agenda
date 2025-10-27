@@ -31,9 +31,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Select } from "@/components/ui/select";
+import { doctorsTable } from "@/db/schema";
 
 import { medicalSpecialties } from "../_constants";
-import { doctorsTable } from "@/db/schema";
 
 const formSchema = z
   .object({
