@@ -10,7 +10,7 @@ import { usersToClinicsTable } from "@/db/schema";
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
-    usePlural: true,
+    usePlural: false,
     schema,
   }),
   socialProviders: {
@@ -28,7 +28,6 @@ export const auth = betterAuth({
           clinic: true,
         },
       });
-      // TODO: Handle multiple clinics
       const clinic = clinics?.[0];
       return {
         user: {
