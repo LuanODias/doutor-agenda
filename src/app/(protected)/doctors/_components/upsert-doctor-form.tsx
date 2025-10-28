@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertDialogTrigger } from "@radix-ui/react-alert-dialog";
 import { TrashIcon } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { NumericFormat } from "react-number-format";
 import { toast } from "sonner";
@@ -80,11 +81,16 @@ const formSchema = z
   );
 
 interface UpsertDoctorFormProps {
+  isOpen: boolean;
   doctor?: typeof doctorsTable.$inferSelect;
   OnSuccess?: () => void;
 }
 
-const UpsertDoctorForm = ({ doctor, OnSuccess }: UpsertDoctorFormProps) => {
+const UpsertDoctorForm = ({
+  doctor,
+  OnSuccess,
+  isOpen,
+}: UpsertDoctorFormProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -100,13 +106,45 @@ const UpsertDoctorForm = ({ doctor, OnSuccess }: UpsertDoctorFormProps) => {
     },
   });
 
+  useEffect(() => {
+    if (isOpen) {
+      if (doctor) {
+        form.reset({
+          name: doctor.name,
+          speciality: doctor.speciality,
+          appointmentPrice: doctor.appointmentPriceInCents / 100,
+          availableFromWeekDay: doctor.availableFromWeekdays.toString(),
+          availableToWeekDay: doctor.availableToWeekdays.toString(),
+          availableFromTime: doctor.availableFromTime,
+          availableToTime: doctor.availableToTime,
+        });
+      } else {
+        form.reset({
+          name: "",
+          speciality: "",
+          appointmentPrice: 0,
+          availableFromWeekDay: "1",
+          availableToWeekDay: "5",
+          availableFromTime: "",
+          availableToTime: "",
+        });
+      }
+    }
+  }, [isOpen, doctor, form]);
+
   const upsertDoctorAction = useAction(upsertDoctor, {
     onSuccess: () => {
-      toast.success("Médico adicionado com sucesso");
+      toast.success(
+        doctor
+          ? "Médico atualizado com sucesso"
+          : "Médico adicionado com sucesso",
+      );
       OnSuccess?.();
     },
     onError: () => {
-      toast.error("Erro ao adicionar médico");
+      toast.error(
+        doctor ? "Erro ao atualizar médico" : "Erro ao adicionar médico",
+      );
     },
   });
 
@@ -165,10 +203,7 @@ const UpsertDoctorForm = ({ doctor, OnSuccess }: UpsertDoctorFormProps) => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Especialidade</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
+                <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Selecione uma especialidade" />
@@ -214,10 +249,7 @@ const UpsertDoctorForm = ({ doctor, OnSuccess }: UpsertDoctorFormProps) => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Dia inicial de disponibilidade</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
+                <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Selecione um dia" />
@@ -243,10 +275,7 @@ const UpsertDoctorForm = ({ doctor, OnSuccess }: UpsertDoctorFormProps) => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Dia final de disponibilidade</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
+                <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Selecione um dia" />
@@ -273,10 +302,7 @@ const UpsertDoctorForm = ({ doctor, OnSuccess }: UpsertDoctorFormProps) => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Horário inicial de disponibilidade</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
+                <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Selecione um dia" />
@@ -343,10 +369,7 @@ const UpsertDoctorForm = ({ doctor, OnSuccess }: UpsertDoctorFormProps) => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Horário final de disponibilidade</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
+                <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Selecione um dia" />

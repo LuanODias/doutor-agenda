@@ -22,7 +22,6 @@ export const getAvailability = (doctor: typeof doctorsTable.$inferSelect) => {
     .set("hour", Number(doctor.availableToTime.split(":")[0]))
     .set("minute", Number(doctor.availableToTime.split(":")[1]))
     .set("second", Number(doctor.availableToTime.split(":")[2] || 0))
-    .add(1, "day")
     .local();
 
   return { from, to };
