@@ -12,7 +12,7 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { NumericFormat } from "react-number-format";
 import { toast } from "sonner";
-import { z } from "zod";
+import { date, z } from "zod";
 
 import { upsertAppointment } from "@/actions/upsert-appointment";
 import { Button } from "@/components/ui/button";
@@ -175,6 +175,23 @@ const UpsertAppointmentForm = ({
     });
   };
 
+  const isDateAvailable = (date: Date) => {
+    if (!selectedDoctorId) {
+      return false;
+    }
+    const selectedDoctor = doctors.find(
+      (doctor) => doctor.id == selectedDoctorId,
+    );
+    if (!selectedDoctor) {
+      return false;
+    }
+    const dayOfWeek = date.getDay();
+    return (
+      dayOfWeek >= (selectedDoctor.availableFromWeekdays ?? 0) &&
+      dayOfWeek <= (selectedDoctor.availableToWeekdays ?? 6)
+    );
+  };
+
   const isDateEnabled = !!(selectedPatientId && selectedDoctorId);
   const isTimeEnabled = !!(selectedPatientId && selectedDoctorId);
   const isPriceEnabled = !!selectedDoctorId;
@@ -298,7 +315,9 @@ const UpsertAppointmentForm = ({
                       mode="single"
                       selected={field.value}
                       onSelect={field.onChange}
-                      disabled={!isDateEnabled}
+                      disabled={(date) =>
+                        date < new Date() || !isDateAvailable(date)
+                      }
                       locale={ptBR}
                     />
                   </PopoverContent>
