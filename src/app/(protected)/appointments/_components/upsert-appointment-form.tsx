@@ -47,6 +47,8 @@ import {
 } from "@/components/ui/select";
 import { appointmentsTable, doctorsTable, patientsTable } from "@/db/schema";
 import { ptBR } from "date-fns/locale";
+import { useQuery } from "@tanstack/react-query";
+import { getAvailableTimes } from "@/actions/get-available-times";
 
 const formSchema = z.object({
   patientId: z.string().uuid({
@@ -97,6 +99,21 @@ const UpsertAppointmentForm = ({
   const selectedDoctorId = form.watch("doctorId");
   const selectedPatientId = form.watch("patientId");
   const selectedDoctor = doctors.find((d) => d.id === selectedDoctorId);
+  const selectedDate = form.watch("date");
+
+  const { data: availableTimes } = useQuery({
+    queryKey: ["available-times", selectedDate, selectedDoctorId],
+    queryFn: () =>
+      getAvailableTimes({
+        date: dayjs(selectedDate).format("YYYY-MM-DD"),
+        doctorId: selectedDoctorId,
+      }),
+    enabled: !!selectedDate && !!selectedDoctorId,
+  });
+
+  useEffect(() => {
+    form.setValue("time", "");
+  }, [selectedDate, selectedDoctorId, form]);
 
   useEffect(() => {
     if (selectedDoctor?.appointmentPriceInCents && !appointment) {
@@ -300,7 +317,7 @@ const UpsertAppointmentForm = ({
                 <Select
                   onValueChange={field.onChange}
                   value={field.value}
-                  disabled={!isTimeEnabled}
+                  disabled={!isTimeEnabled || !selectedDate}
                 >
                   <FormControl>
                     <SelectTrigger className="w-full">
@@ -308,7 +325,11 @@ const UpsertAppointmentForm = ({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {/* Placeholder - sem opções por enquanto */}
+                    {availableTimes?.data?.map((time) => (
+                      <SelectItem key={time.value} value={time.value}>
+                        {time.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 <FormMessage />
