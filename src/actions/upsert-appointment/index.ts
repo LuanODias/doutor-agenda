@@ -11,6 +11,7 @@ import { auth } from "@/lib/auth";
 import { actionClient } from "@/lib/next-safe-action";
 
 import { upsertAppointmentSchema } from "./schema";
+import { getAvailableTimes } from "../get-available-times";
 
 dayjs.extend(utc);
 
@@ -27,6 +28,20 @@ export const upsertAppointment = actionClient
 
     if (!session?.user.clinic) {
       throw new Error("Clinic not found");
+    }
+
+    const availableTimes = await getAvailableTimes({
+      doctorId: parsedInput.doctorId,
+      date: dayjs(parsedInput.date).format("YYYY-MM-DD"),
+    });
+    if (!availableTimes?.data) {
+      throw new Error("No available times");
+    }
+    const isTimeAvailable = availableTimes.data?.some(
+      (time) => time.value == parsedInput.time,
+    );
+    if (!isTimeAvailable) {
+      throw new Error("Time not available");
     }
 
     // Combina data e horário em uma única data/hora
