@@ -33,7 +33,7 @@ const PatientsPage = async () => {
   }
 
   const patients = await db.query.patientsTable.findMany({
-    where: eq(patientsTable.clinic_id, session.user.clinic.id),
+    where: eq(patientsTable.clinicId, session.user.clinic.id),
   });
 
   return (

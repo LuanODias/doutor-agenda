@@ -150,7 +150,7 @@ export const patientSexEnum = pgEnum("patient_sex", ["male", "female"]);
 
 export const patientsTable = pgTable("patients", {
   id: uuid("id").defaultRandom().primaryKey(),
-  clinic_id: uuid("clinic_id")
+  clinicId: uuid("clinic_id")
     .notNull()
     .references(() => clinicsTable.id, {
       onDelete: "cascade",
@@ -168,7 +168,7 @@ export const patientsTable = pgTable("patients", {
 
 export const patientsTableRelations = relations(patientsTable, ({ one }) => ({
   clinic: one(clinicsTable, {
-    fields: [patientsTable.clinic_id],
+    fields: [patientsTable.clinicId],
     references: [clinicsTable.id],
   }),
 }));
