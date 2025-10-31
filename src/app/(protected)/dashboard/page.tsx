@@ -1,8 +1,10 @@
+import dayjs from "dayjs";
+import { Calendar } from "lucide-react";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { auth } from "@/lib/auth";
-
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DataTable } from "@/components/ui/data-table";
 import {
   PageActions,
   PageContainer,
@@ -12,12 +14,16 @@ import {
   PageHeaderContent,
   PageTitle,
 } from "@/components/ui/page-container";
+import { getDashboard } from "@/data/get-dashboards";
+import { auth } from "@/lib/auth";
+
+import { appointmentsTableColumns } from "../appointments/_components/table-columns";
+
 import { DatePicker } from "./_components/date-picker";
-import { StatsCards } from "./_components/stats-cards";
-import { db } from "@/db";
-import { appointmentsTable, doctorsTable, patientsTable } from "@/db/schema";
-import { and, count, eq, gte, lte, sum } from "drizzle-orm";
-import dayjs from "dayjs";
+import StatsCards from "./_components/stats-cards";
+import AppointmentsChart from "./_components/appointments-chart";
+import TopDoctors from "./_components/top-doctors";
+import TopSpecialties from "./_components/top-specialties";
 
 interface DashboardPageProps {
   searchParams: Promise<{
@@ -30,60 +36,41 @@ const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
-
   if (!session?.user) {
     redirect("/authentication");
   }
-
-  //Preciso pegar as clinicas do usuario
-  if (!session.user.clinic) redirect("/clinic-form");
-
+  if (!session.user.clinic) {
+    redirect("/clinic-form");
+  }
+  // if (!session.user.plan) {
+  //   redirect("/new-subscription");
+  // }
   const { from, to } = await searchParams;
   if (!from || !to) {
     redirect(
       `/dashboard?from=${dayjs().format("YYYY-MM-DD")}&to=${dayjs().add(1, "month").format("YYYY-MM-DD")}`,
     );
   }
-
-  const [[totalRevenue], [totalAppointments], [totalPatients], [totalDoctors]] =
-    await Promise.all([
-      db
-        .select({
-          total: sum(appointmentsTable.appointmentPriceInCents),
-        })
-        .from(appointmentsTable)
-        .where(
-          and(
-            eq(appointmentsTable.clinicId, session.user.clinic.id),
-            gte(appointmentsTable.date, new Date(from)),
-            lte(appointmentsTable.date, new Date(to)),
-          ),
-        ),
-      db
-        .select({
-          total: count(appointmentsTable.appointmentPriceInCents),
-        })
-        .from(appointmentsTable)
-        .where(
-          and(
-            eq(appointmentsTable.clinicId, session.user.clinic.id),
-            gte(appointmentsTable.date, new Date(from)),
-            lte(appointmentsTable.date, new Date(to)),
-          ),
-        ),
-      db
-        .select({
-          total: count(),
-        })
-        .from(patientsTable)
-        .where(eq(patientsTable.clinicId, session.user.clinic.id)),
-      db
-        .select({
-          total: count(),
-        })
-        .from(doctorsTable)
-        .where(eq(doctorsTable.clinicId, session.user.clinic.id)),
-    ]);
+  const {
+    totalRevenue,
+    totalAppointments,
+    totalPatients,
+    totalDoctors,
+    topDoctors,
+    topSpecialties,
+    todayAppointments,
+    dailyAppointmentsData,
+  } = await getDashboard({
+    from,
+    to,
+    session: {
+      user: {
+        clinic: {
+          id: session.user.clinic.id,
+        },
+      },
+    },
+  });
 
   return (
     <PageContainer>
@@ -95,16 +82,39 @@ const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
           </PageDescription>
         </PageHeaderContent>
         <PageActions>
-          <DatePicker></DatePicker>
+          <DatePicker />
         </PageActions>
       </PageHeader>
       <PageContent>
         <StatsCards
-          totalRevenueInCents={Number(totalRevenue?.total ?? 0)}
-          totalAppointments={Number(totalAppointments?.total ?? 0)}
-          totalPatients={Number(totalPatients?.total ?? 0)}
-          totalDoctors={Number(totalDoctors?.total ?? 0)}
+          totalRevenue={totalRevenue.total ? Number(totalRevenue.total) : null}
+          totalAppointments={totalAppointments.total}
+          totalPatients={totalPatients.total}
+          totalDoctors={totalDoctors.total}
         />
+        <div className="grid grid-cols-[2.25fr_1fr] gap-4">
+          <AppointmentsChart dailyAppointmentsData={dailyAppointmentsData} />
+          <TopDoctors doctors={topDoctors} />
+        </div>
+        <div className="grid grid-cols-[2.25fr_1fr] gap-4">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <Calendar className="text-muted-foreground" />
+                <CardTitle className="text-base">
+                  Agendamentos de hoje
+                </CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <DataTable
+                columns={appointmentsTableColumns}
+                data={todayAppointments}
+              />
+            </CardContent>
+          </Card>
+          <TopSpecialties topSpecialties={topSpecialties} />
+        </div>
       </PageContent>
     </PageContainer>
   );
