@@ -1,97 +1,96 @@
-<div align="center">
-<!-- Você pode substituir este H1 por sua logo se tiver uma -->
-<h1 style="font-size: 3rem; font-weight: bold; border-bottom: none;">
-Doutor Agenda
-</h1>
+<div align="center"> <h1 style="font-size: 3rem; font-weight: bold; border-bottom: none;"> Doutor Agenda </h1>
 
-<p>
-<strong>Um sistema SaaS (Software as a Service) completo para gerenciamento de agendamentos em clínicas médicas.</strong>
-</p>
-<p>
-Construído com as tecnologias mais modernas, incluindo Next.js, Drizzle, Stripe e Shadcn/ui.
-</p>
+<p> <strong>Um sistema SaaS (Software as a Service) completo para gerenciamento de agendamentos em clínicas médicas.</strong> </p> <p> Construído com as tecnologias mais modernas, incluindo Next.js (App Router), Drizzle ORM, Stripe, Better Auth e Shadcn/ui. </p>
 
-<p>
-<img src="https://www.google.com/search?q=https://img.shields.io/github/license/luanodias/doutor-agenda%3Fstyle%3Dflat-square%26color%3Dblue" alt="Licença">
-<img src="https://www.google.com/search?q=https://img.shields.io/github/last-commit/luanodias/doutor-agenda%3Fstyle%3Dflat-square%26color%3Dbrightgreen" alt="Último Commit">
-<img src="https://www.google.com/search?q=https://img.shields.io/badge/Next.js-15-black%3Fstyle%3Dflat-square%26logo%3Dnextdotjs" alt="Next.js">
-<img src="https://www.google.com/search?q=https://img.shields.io/badge/Drizzle-ORM-brightgreen%3Fstyle%3Dflat-square%26logo%3Ddrizzle" alt="Drizzle ORM">
-<img src="https://www.google.com/search?q=https://img.shields.io/badge/Stripe-blueviolet%3Fstyle%3Dflat-square%26logo%3Dstripe" alt="Stripe">
-</p>
-</div>
-
-<!-- Tópico "Preview da Aplicação" -->
-
-📸 Preview da Aplicação
-
-Aqui está uma prévia do dashboard principal do Doutor Agenda.
-
-<!-- Substitua pela URL de uma imagem ou GIF do seu projeto -->
-
-📋 Índice
-
-Sobre o Projeto
-
-✨ Principais Funcionalidades
-
-🛠️ Tech Stack
-
-🚀 Como Rodar Localmente
-
-Pré-requisitos
-
-Instalação
-
-Variáveis de Ambiente
-
-Banco de Dados
-
-Rodando o Projeto
-
-📄 Licença
-
-👨‍💻 Autor
+<p> <img src="https://img.shields.io/badge/Next.js-16.0.1-black?style=flat-square&logo=nextdotjs" alt="Next.js"> <img src="https://img.shields.io/badge/Auth-Better_Auth-blue?style=flat-square" alt="Better Auth"> <img src="https://img.shields.io/badge/ORM-Drizzle-brightgreen?style=flat-square&logo=drizzle" alt="Drizzle ORM"> <img src="https://img.shields.io/badge/Payments-Stripe-blueviolet?style=flat-square&logo=stripe" alt="Stripe"> <img src="https://img.shields.io/badge/UI-Shadcn/ui-black?style=flat-square" alt="Shadcn/ui"> <img src="https://img.shields.io/badge/Database-PostgreSQL-blue?style=flat-square&logo=postgresql" alt="PostgreSQL"> </p> </div>
 
 📖 Sobre o Projeto
+O Doutor Agenda é uma plataforma SaaS robusta projetada para simplificar e automatizar o gerenciamento de clínicas médicas. A aplicação é multi-tenant, onde cada usuário (administrador) pode criar e gerenciar sua própria clínica.
 
-O Doutor Agenda é uma plataforma SaaS robusta projetada para simplificar e automatizar o gerenciamento de clínicas médicas. A aplicação permite que administradores de clínicas cadastrem médicos, pacientes e gerenciem seus agendamentos de forma eficiente.
+A plataforma permite que administradores de clínicas cadastrem médicos (com horários de disponibilidade complexos), pacientes e gerenciem seus agendamentos de forma eficiente.
 
-O projeto inclui um sistema completo de autenticação, integração de pagamentos para planos de assinatura com Stripe, e um dashboard analítico para acompanhar métricas vitais da clínica.
+O projeto inclui um sistema completo de autenticação (Email/Senha e Google OAuth), integração de pagamentos para planos de assinatura com Stripe, e um dashboard analítico para acompanhar métricas vitais da clínica em tempo real.
 
 ✨ Principais Funcionalidades
+A aplicação é rica em funcionalidades, todas construídas usando as práticas mais recentes do Next.js, como Server Actions e App Router.
 
-Autenticação Completa: Cadastro e login com Email/Senha e provedor Google OAuth (via better-auth).
+Autenticação Completa:
 
-Gerenciamento de Clínica: Fluxo de criação de clínica para novos usuários.
+Cadastro e login com Email/Senha e provedor Google OAuth.
 
-Sistema de Assinatura: Integração com Stripe para gerenciamento de planos (Essential) e checkout.
+Gerenciado pela biblioteca better-auth com um adaptador Drizzle.
 
-Webhooks Stripe: Rota de API segura para receber e processar eventos do Stripe (ex: invoice.paid, customer.subscription.deleted).
+Gerenciamento de Clínica (Multi-Tenancy):
+
+Fluxo de onboarding onde novos usuários criam sua própria clínica.
+
+Todos os dados principais (médicos, pacientes, agendamentos) são vinculados por clinicId, garantindo a separação dos dados.
+
+A sessão do usuário é personalizada para incluir os dados da clínica ativa.
+
+Sistema de Assinatura (Stripe):
+
+Integração com Stripe para gerenciamento de planos (plano "Essential") e checkout.
+
+Rota de API segura para Webhooks Stripe (/api/stripe/webhook).
+
+Manipula o evento invoice.paid para atualizar o plano do usuário no banco de dados.
+
+Manipula o evento customer.subscription.deleted para remover o plano do usuário.
+
+Página de assinatura para o usuário gerenciar seu plano, com link para o Portal do Cliente Stripe.
+
+Proteção de rotas que exigem uma assinatura ativa.
 
 Dashboard Analítico:
 
-Cards de estatísticas (Faturamento total, Agendamentos, Pacientes, Médicos).
+Cards de estatísticas com (Faturamento total, Total de Agendamentos, Total de Pacientes, Total de Médicos).
 
-Gráfico de faturamento e agendamentos por período.
+Filtro de período (de/para) que atualiza todos os dados do dashboard.
 
-Ranking de "Top Médicos" e "Top Especialidades".
+Gráfico de Faturamento e Agendamentos (recharts) que exibe dados diários.
 
-Tabela de agendamentos do dia.
+Ranking de "Top Médicos" e "Top Especialidades" com base no número de agendamentos.
 
-Gestão de Médicos (CRUD): Cadastro completo de médicos, incluindo especialidade, preço da consulta e horários de disponibilidade.
+Tabela com os agendamentos do dia.
 
-Gestão de Pacientes (CRUD): Cadastro de pacientes com informações de contato.
+Gestão de Médicos (CRUD):
+
+CRUD completo para Médicos.
+
+Cadastro de nome, especialidade (lista pré-definida) e preço da consulta.
+
+Sistema de disponibilidade avançada, permitindo definir dias da semana (ex: Segunda a Sexta) e horários (ex: 08:00 às 18:00).
+
+Gestão de Pacientes (CRUD):
+
+CRUD completo para Pacientes.
+
+Interface gerenciada por uma DataTable (TanStack Table).
+
+Campos para nome, email, telefone (com máscara) e sexo.
 
 Gestão de Agendamentos (CRUD):
 
-Sistema inteligente para criar agendamentos, mostrando apenas horários disponíveis.
+CRUD completo para Agendamentos.
 
-Verificação de disponibilidade em tempo real (get-available-times).
+Agendamento Inteligente: O formulário de criação (upsert-appointment-form) busca horários disponíveis em tempo real.
 
-UI Moderna e Responsiva: Construído com Shadcn/ui e Tailwind CSS.
+Verificação de Disponibilidade: A Server Action getAvailableTimes verifica a disponibilidade do médico (dias da semana e horários) e cruza com os agendamentos já existentes para aquele dia, mostrando apenas os slots livres.
+
+Utiliza TanStack Query (React Query) no cliente para buscar os horários disponíveis dinamicamente.
+
+Arquitetura e UI:
+
+Construído com Next.js App Router e Server Components.
+
+Mutations de dados (CRUDs) são feitas com Server Actions.
+
+Validação de schema em Server Actions usando next-safe-action e Zod.
+
+UI moderna e responsiva construída com Shadcn/ui e Tailwind CSS.
 
 🛠️ Tech Stack
-
 As principais tecnologias utilizadas neste projeto são:
 
 Framework: Next.js (App Router)
@@ -112,41 +111,43 @@ Formulários: React Hook Form & Zod
 
 Server Actions: Next Safe Action
 
-Busca de Dados (Client): TanStack Query (React Query)
+Estado (Cliente): TanStack Query (React Query)
+
+Tabelas: TanStack Table
+
+Gráficos: Recharts
+
+Manipulação de Datas: Day.js
+
+Estado da URL: Nuqs (para filtros do dashboard)
 
 🚀 Como Rodar Localmente
-
 Siga estas instruções para configurar e rodar o projeto em sua máquina local.
 
 Pré-requisitos
-
 Node.js (v18 ou superior)
 
-npm ou pnpm
+npm (ou pnpm/yarn)
 
 Uma instância do PostgreSQL rodando (localmente ou na nuvem, ex: Vercel Postgres, Supabase)
 
-Instalação
+Uma conta Stripe para as chaves de API.
 
-Clone o repositório:
+1. Instalação
+   Clone o repositório:
 
-git clone [https://github.com/luanodias/doutor-agenda.git](https://github.com/luanodias/doutor-agenda.git)
+Bash
+
+git clone https://github.com/luanodias/doutor-agenda.git
 cd doutor-agenda
-
 Instale as dependências:
 
-npm install
+Bash
 
-# ou
+npm install 2. Variáveis de Ambiente
+Crie um arquivo .env na raiz do projeto. Você pode copiar o .env.example se ele existir, ou usar a estrutura abaixo.
 
-# pnpm install
-
-Variáveis de Ambiente
-
-Configure seu .env:
-Crie um arquivo .env na raiz do projeto, copiando o exemplo abaixo (.env.example).
-
-# .env
+Snippet de código
 
 # Drizzle / Postgres
 
@@ -156,7 +157,7 @@ DATABASE_URL="SUA_URL_DO_POSTGRES"
 
 # Better Auth (Google)
 
-# Siga o guia: [https://better-auth.dev/docs/getting-started/google](https://better-auth.dev/docs/getting-started/google)
+# Siga o guia: https://better-auth.dev/docs/getting-started/google
 
 GOOGLE_CLIENT_ID="SEU_CLIENT_ID_DO_GOOGLE"
 GOOGLE_CLIENT_SECRET="SEU_CLIENT_SECRET_DO_GOOGLE"
@@ -181,32 +182,26 @@ STRIPE_WEBHOOK_SECRET="whsec_SEU_WEBHOOK_SECRET"
 # URLs da Aplicação
 
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
-NEXT_PUBLIC_STRIPE_CUSTOMER_PORTAL_URL="SEU_LINK_DO_PORTAL_DO_CLIENTE_STRIPE"
+NEXT_PUBLIC_STRIPE_CUSTOMER_PORTAL_URL="SEU_LINK_DO_PORTAL_DO_CLIENTE_STRIPE" 3. Banco de Dados
+Execute as Migrações do Drizzle. Este comando irá sincronizar seu schema (src/db/schema.ts) com o banco de dados.
 
-Banco de Dados
-
-Execute as Migrações do Drizzle:
-Este comando irá sincronizar seu schema (src/db/schema.ts) com o banco de dados.
+Bash
 
 npx drizzle-kit push
+Nota: drizzle-kit usará o dialeto postgresql conforme definido em drizzle.config.ts.
 
-Rodando o Projeto
+4. Rodando o Projeto
+   Inicie o servidor de desenvolvimento:
 
-Inicie o servidor de desenvolvimento:
+Bash
 
 npm run dev
-
-Abra o navegador:
-Acesse http://localhost:3000 e veja a aplicação funcionando!
+Abra o navegador e acesse http://localhost:3000 para ver a aplicação funcionando!
 
 📄 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
+Este projeto está sob a licença MIT. Veja o arquivo LICENSE (não fornecido nos arquivos, mas mencionado no README.md original) para mais detalhes.
 
 👨‍💻 Autor
-
 Feito com ❤️ por Luan Dias.
 
-<!-- Adicione seus links -->
-
-GitHub | LinkedIn
+LinkedIn: https://www.linkedin.com/in/luan-de-oliveira-dias-944992193/
