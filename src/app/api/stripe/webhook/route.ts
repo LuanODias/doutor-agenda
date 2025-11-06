@@ -25,26 +25,34 @@ export const POST = async (request: Request) => {
 
   switch (event.type) {
     case "invoice.paid": {
-      if (!event.data.object.id) {
-        throw new Error("Subscription ID not found");
-      }
-      const { subscription, subscription_details, customer } = event.data
-        .object as unknown as {
+      // --- INÍCIO DA CORREÇÃO ---
+
+      // Tipamos o objeto 'invoice' para acessar os dados aninhados
+      const invoice = event.data.object as {
         customer: string;
-        subscription: string;
-        subscription_details: {
-          metadata: {
-            userId: string;
+        parent: {
+          subscription_details: {
+            metadata: {
+              userId: string;
+            };
+            subscription: string;
           };
-        };
+        } | null;
       };
-      if (!subscription) {
-        throw new Error("Subscription not found");
+
+      const customer = invoice.customer;
+
+      // Buscamos os dados do local correto (aninhado em 'parent')
+      const subscription = invoice.parent?.subscription_details?.subscription;
+      const userId = invoice.parent?.subscription_details?.metadata?.userId;
+
+      // Se não for uma fatura de assinatura (ou não tiver userId),
+      // apenas confirmamos o recebimento e saímos.
+      if (!subscription || !userId) {
+        return NextResponse.json({ received: true });
       }
-      const userId = subscription_details.metadata.userId;
-      if (!userId) {
-        throw new Error("User ID not found");
-      }
+
+      // Agora podemos atualizar o banco com os dados corretos
       await db
         .update(usersTable)
         .set({
@@ -53,6 +61,8 @@ export const POST = async (request: Request) => {
           plan: "essential",
         })
         .where(eq(usersTable.id, userId));
+
+      // --- FIM DA CORREÇÃO ---
       break;
     }
     case "customer.subscription.deleted": {
